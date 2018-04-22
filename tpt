@@ -14,10 +14,8 @@ _print_help() {
 EOF
 }
 
-
-pkgs=()
 _find_packages() {
-  local identifiers=(".mjornir.yaml" "package.xml" ".travis.yml")
+  local identifiers=(".mjornir.yaml" "package.xml" ".travis.yml" ".gitlab-ci.yml")
   for identifier in "${identifiers[@]}"
   do
     while IFS= read -r p
@@ -113,6 +111,7 @@ tpt() {
 
 complete -o bashdefault -F _tpt tpt
 
+# Don't run the command if sourcing the file
 if ! [[ $_ != "$0" ]]; then
   tpt "$@"
 fi
