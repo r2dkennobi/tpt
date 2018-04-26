@@ -22,8 +22,10 @@ _find_packages() {
     do
       dir_path=$(dirname "$p")
       pkg_name=$(basename "$dir_path")
-      pkgs+=("$pkg_name:$dir_path")
-    done < <(find "$PROJECT_DIR" -not -path '*/\.*' -name "$identifier")
+      if [[ ${dir_path} != *"/\."* ]]; then
+        pkgs+=("$pkg_name:$dir_path")
+      fi
+    done < <(find "$1" -name "$identifier")
   done
   # ^ TODO I can do better than this
 }
@@ -40,7 +42,7 @@ _bash_complete_packages() {
 _tpt() {
   PROJECT_DIR=${PROJECT_DIR:-"$HOME"}
   local pkgs=()
-  _find_packages
+  _find_packages "$PROJECT_DIR"
   local cur prev verbs
 
   COMPREPLY=()
@@ -86,7 +88,7 @@ tpt() {
     cd - || exit
   else
     local pkgs=()
-    _find_packages
+    _find_packages "$PROJECT_DIR"
     matches=()
     for entry in "${pkgs[@]}"
     do

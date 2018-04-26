@@ -2,7 +2,7 @@
 
 ![Build Status](https://travis-ci.org/r2dkennobi/tpt.svg?branch=master)
 
-A simple bash script that allows users to jump to a project folder on their
+A simple bash function that allows users to jump to a project folder on their
 system. Similar to how `roscd` works in ROS.
 
 # How to use
@@ -11,7 +11,8 @@ system. Similar to how `roscd` works in ROS.
 $ tpt my-project
 
 # Override the search path. Variable can also be exported.
-$ PROJECT_DIR=<some-dir> tpt my-project
+$ export PROJECT_DIR=<some-dir>
+$ tpt my-project
 ```
 
 # Dependency
