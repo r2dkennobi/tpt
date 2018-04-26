@@ -19,7 +19,7 @@ _find_packages() {
   do
     dir_path=$(dirname "$p")
     pkg_name=$(basename "$dir_path")
-    if [[ ${dir_path} != *"/\."* ]]; then
+    if [[ ${dir_path} != *"/."* ]]; then
       pkgs+=("$pkg_name:$dir_path")
     fi
   done < <(find "$1" -type f \( -name ".mjornir.yaml" -o \
