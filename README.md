@@ -37,10 +37,11 @@ for now.)
 The script identifies packages based on whether a specific file is present
 in the directory. Currently supported files are listed below:
 
-- .mjornir.yaml
-- package.xml
-- .travis.yml
-- .gitlab-ci.yml
+- `.mjornir.yaml`
+- `package.xml`
+- `.travis.yml`
+- `.gitlab-ci.yml`
+- `WORKSPACE`
 
 # Planned features
 
