@@ -27,6 +27,7 @@ _generate_cache_if_necessary() {
 _generate_cache() {
   mkdir -p "$HOME/.cache"
   {
+  IFS=' ' read -r -a projects <<< "$1"
   while IFS= read -r p
   do
     dir_path=$(dirname "$p")
@@ -34,11 +35,11 @@ _generate_cache() {
     if [[ ${dir_path} != *"/."* ]]; then
       echo "$pkg_name:$dir_path"
     fi
-  done < <(find "$1" -type f \( -name ".mjornir.yaml" -o \
-                                -name "package.xml" -o \
-                                -name ".travis.yml" -o \
-                                -name ".gitlab-ci.yml" -o \
-                                -name "WORKSPACE" \))
+  done < <(find "${projects[@]}" -type f \( -name ".mjornir.yaml" -o \
+                                            -name "package.xml" -o \
+                                            -name ".travis.yml" -o \
+                                            -name ".gitlab-ci.yml" -o \
+                                            -name "WORKSPACE" \))
   } > "$TPT_CACHE_FILE"
 }
 

@@ -11,8 +11,15 @@ system. Similar to how `roscd` works in ROS.
 $ tpt my-project
 
 # Override the search path. Variable can also be exported.
-$ export PROJECT_DIR=<some-dir>
+$ export PROJECT_DIR="<some-dir1> <some-dir2> <some-dir3>..."
 $ tpt my-project
+
+# To update the project list cache (The cache will auto-generate the first time
+# the command is executed.
+$ tpt --update-cache
+
+# For more info
+$ tpt --help
 ```
 
 # Dependency
