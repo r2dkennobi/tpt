@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TPT_CACHE_FILE="$HOME/.cache/tpt.runcache"
+
 _print_help() {
   cat <<EOF
   SYNOPSYS:
@@ -9,46 +11,54 @@ _print_help() {
     Transport yourself to another dimension (package folder)
 
   OPTION:
-    --help, h
+    --help, -h
       Show this usage screen
+    --update-cache, -h
+      Update the auto-completion cache
 EOF
 }
 
-_find_packages() {
+_generate_cache_if_necessary() {
+  if ! [[ -e "$TPT_CACHE_FILE" ]]; then
+    _generate_cache "$1"
+  fi
+}
+
+_generate_cache() {
+  mkdir -p "$HOME/.cache"
+  {
   while IFS= read -r p
   do
     dir_path=$(dirname "$p")
     pkg_name=$(basename "$dir_path")
     if [[ ${dir_path} != *"/."* ]]; then
-      pkgs+=("$pkg_name:$dir_path")
+      echo "$pkg_name:$dir_path"
     fi
   done < <(find "$1" -type f \( -name ".mjornir.yaml" -o \
                                 -name "package.xml" -o \
                                 -name ".travis.yml" -o \
                                 -name ".gitlab-ci.yml" -o \
                                 -name "WORKSPACE" \))
-  # ^ TODO I can do better than this
+  } > "$TPT_CACHE_FILE"
 }
 
 _bash_complete_packages() {
   (
-  for entry in "${pkgs[@]}"
-  do
-    echo "${entry%%:*}"
-  done
+  while IFS='' read -r line; do
+    echo "${line%%:*}"
+  done < "$TPT_CACHE_FILE"
   )
 }
 
 _tpt() {
   PROJECT_DIR=${PROJECT_DIR:-"$HOME"}
-  local pkgs=()
-  _find_packages "$PROJECT_DIR"
+  _generate_cache_if_necessary "$PROJECT_DIR"
   local cur prev verbs
 
   COMPREPLY=()
   cur=${COMP_WORDS[COMP_CWORD]}
   prev=${COMP_WORDS[COMP_CWORD-1]}
-  verbs="-h --help"
+  verbs="-h --help -u --update-cache"
 
   if [[ ${COMP_CWORD} -eq 1 ]]; then
     COMPREPLY=($(compgen -W "${verbs} $(_bash_complete_packages)" -- "${cur}"))
@@ -64,12 +74,16 @@ _tpt() {
 
 tpt() {
   PROJECT_DIR=${PROJECT_DIR:-"$HOME"}
-  local show_help tpt_back
+  local show_help tpt_back update_cache
   for arg in "$@";
   do
     case $arg in
       -h|--help)
         show_help=true
+        shift
+        ;;
+      -u|--update-cache)
+        update_cache=true
         shift
         ;;
       -)
@@ -86,18 +100,18 @@ tpt() {
     _print_help
   elif [[ "${tpt_back:-false}" == "true" ]]; then
     cd - || exit
+  elif [[ "${update_cache:-false}" == "true" ]]; then
+    _generate_cache "$PROJECT_DIR"
   else
-    local pkgs=()
-    _find_packages "$PROJECT_DIR"
-    matches=()
-    for entry in "${pkgs[@]}"
-    do
-      package="${entry%%:*}"
-      path="${entry##*:}"
+    _generate_cache_if_necessary "$PROJECT_DIR"
+    local matches=()
+    while IFS='' read -r line; do
+      package="${line%%:*}"
+      path="${line##*:}"
       if [[ "$package" == "$1" ]]; then
         matches+=($path)
       fi
-    done
+    done < "$TPT_CACHE_FILE"
     if [[ "${#matches[@]}" -eq 0 ]]; then
       return
     elif [[ "${#matches[@]}" -eq 1 ]]; then
