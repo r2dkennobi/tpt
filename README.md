@@ -29,10 +29,13 @@ $ tpt --help
 
 # Install
 
-Clone the repo and source the `tpt` script in your `.bash_profile`
-(or wherever else depending on how your system is configured)
+Clone the repo and run the following command:
 
-(Sourcing allows `tpt` to auto-complete package names)
+```
+$ sudo make install
+```
+
+It should create symlinks for the executable and bash completion rules.
 
 # Configure
 
