@@ -26,21 +26,22 @@ _generate_cache_if_necessary() {
 
 _generate_cache() {
   mkdir -p "$HOME/.cache"
+  local dirs=()
   {
   IFS=' ' read -r -a projects <<< "$1"
   while IFS= read -r p
   do
     dir_path=$(dirname "$p")
     pkg_name=$(basename "$dir_path")
-    if [[ ${dir_path} != *"/."* ]]; then
-      echo "$pkg_name:$dir_path"
-    fi
+    dirs+=("$pkg_name:$dir_path")
   done < <(find "${projects[@]}" -type f \( -name ".mjornir.yaml" -o \
                                             -name "package.xml" -o \
                                             -name ".travis.yml" -o \
                                             -name ".gitlab-ci.yml" -o \
                                             -name "WORKSPACE" \))
-  } > "$TPT_CACHE_FILE"
+  dirs=($(echo "${dirs[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+  printf "%s\n" "${dirs[@]}" > "$TPT_CACHE_FILE"
+  }
 }
 
 _bash_complete_packages() {
